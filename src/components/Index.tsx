@@ -8,7 +8,7 @@ const Index = () => {
     <Page title="Vacation Requests">
     <RequestList />
     <Link to="/add">
-        <Button>Add Reservation</Button>
+        <Button>Add Request</Button>
     </Link>
     </Page>   
     );
