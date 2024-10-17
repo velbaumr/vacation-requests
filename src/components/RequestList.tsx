@@ -3,10 +3,10 @@ import apiClient from "../services/ApiCilent";
 import vacationRequest from "../types/VacationRequest";
 
 const RequestList = () => {
-    const [vacationRequests, setVacationrecuests] = useState<Array<vacationRequest> | null>(null);
+    const [vacationRequests, setVacationrecuests] = useState<vacationRequest[] | null>(null);
  
     useEffect(() => {
-        const items = apiClient.get<vacationRequest>('vacation_request');
+        const items = apiClient.get<vacationRequest[]>('vacation_request');
         setVacationrecuests(items);
     }, [])
 
