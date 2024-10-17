@@ -1,8 +1,15 @@
-import apiClient from "../services/apiCilent";
-import vacationRequest from "../types/vacationRequest";
+import { useEffect, useState } from "react";
+import apiClient from "../services/ApiCilent";
+import vacationRequest from "../types/VacationRequest";
 
 const RequestList = () => {
-    const items = apiClient.get<vacationRequest>('vacation_request');
+    const [vacationRequests, setVacationrecuests] = useState<Array<vacationRequest> | null>(null);
+ 
+    useEffect(() => {
+        const items = apiClient.get<vacationRequest>('vacation_request');
+        setVacationrecuests(items);
+    }, [])
+
     return(
     <table>
         <thead>
@@ -15,7 +22,7 @@ const RequestList = () => {
         </thead>
         <tbody>
             {
-                items && items.map((item: vacationRequest) => (
+                vacationRequests && vacationRequests.map((item: vacationRequest) => (
                     <tr>
                         <td></td>
                         <td></td>
