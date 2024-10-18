@@ -4,7 +4,7 @@ import RequestForm from "./RequestForm";
 const AddRequest = () => {
     return(
         <Page title="Add Vacation Request">
-            <RequestForm/>
+        <RequestForm/>
         </Page>);
 }
 

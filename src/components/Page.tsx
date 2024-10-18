@@ -7,7 +7,11 @@ const Page = (props: {title: string, children: React.ReactNode | React.ReactNode
 
     return(
         <div className='container'>
-            <h3>{props.title}</h3>
+            <br/>
+            <div className="text-center">
+                <h3>{props.title}</h3>
+            </div>
+            <br/>
             <div>
                 {props.children}
             </div>

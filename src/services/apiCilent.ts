@@ -8,12 +8,12 @@ class ApiClient {
 
     post = <T>(endpoint: string, payload: T): void => {
         const items = localStorageService.getItem<T[]>(endpoint);
+        
         const newItems = items == null ? [payload] : [...items, payload];
 
         localStorageService.removeItem(endpoint);
         localStorageService.setItem(endpoint, newItems);
     }
-
 }
 
 const apiClient = new ApiClient();
