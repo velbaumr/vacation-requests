@@ -1,7 +1,7 @@
 type vacationRequest = {
     startDate: Date,
     endDate: Date,
-    vacationDays: number,
+    requestedDays: number,
     comment: string
 }
 

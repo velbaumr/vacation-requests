@@ -3,11 +3,11 @@ import apiClient from "../services/ApiCilent";
 import vacationRequest from "../types/VacationRequest";
 
 const RequestList = () => {
-    const [vacationRequests, setVacationrecuests] = useState<vacationRequest[] | null>(null);
+    const [vacationRequests, setVacationRequests] = useState<vacationRequest[] | null>(null);
  
     useEffect(() => {
         const items = apiClient.get<vacationRequest[]>('vacation_requests');
-        setVacationrecuests(items);
+        setVacationRequests(items);
     }, []);
 
     return(
@@ -26,7 +26,7 @@ const RequestList = () => {
                     <tr key={index}>
                         <td>{item.startDate.toString()}</td>
                         <td>{item.endDate.toString()}</td>
-                        <td>{item.vacationDays}</td>
+                        <td>{item.requestedDays}</td>
                         <td>{item.comment}</td>
                     </tr>
                 ))
