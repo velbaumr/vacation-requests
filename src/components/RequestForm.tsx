@@ -1,25 +1,41 @@
-import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { calculateRequestedDays, calculateStartDate, calculateEndDate } from "../functions/FormCalculations";
 import vacationRequest from "../types/VacationRequest";
 import apiClient from "../services/ApiCilent";
+import { useForm } from "react-hook-form";
+
+interface FormData {
+    startDate: string;
+    requestedDays: number;
+    endDate: string;
+    comment?: string;
+  }
 
 const RequestForm = () => {
     const navigate = useNavigate();
-    const [startDateValue, setStartDateValue] = useState<string>('');
-    const [requestedDaysValue, setRequestedDaysValue] = useState<number>(0);
-    const [endDateValue, setEndDateValue] = useState<string>('');
-    const [commentValue, setCommentValue] = useState<string | undefined>()
+
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
+        defaultValues: {
+            startDate: '',
+            requestedDays: 0,
+            endDate: '',
+            comment: ''
+        }
+    });
+    
+    const startDateValue = watch("startDate");
+    const requestedDaysValue = watch("requestedDays");
+    const endDateValue = watch("endDate");
 
 
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const onSubmit = (data: FormData) => {
+
         const result: vacationRequest = {
-            startDate: new Date(startDateValue),
-            endDate: new Date(endDateValue),
-            requestedDays: requestedDaysValue,
-            comment: commentValue || ''
+            startDate: new Date(data.startDate),
+            endDate: new Date(data.endDate),
+            requestedDays: data.requestedDays,
+            comment: data.comment || ''
         };
 
         apiClient.post<vacationRequest>('vacation_requests', result);
@@ -34,78 +50,96 @@ const RequestForm = () => {
         date.toISOString().split('T')[0];
 
     return(
-    <form onSubmit={onSubmit} className="col-md-4  offset-md-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="col-md-4  offset-md-4">
     <Form.Group  className="mb-3">
         <Form.Label  htmlFor="startDate">Start Date</Form.Label>
         <Form.Control type="date"
                       id="startDate"
+                      {...register("startDate", { required: "Start date is required" })}
+                      isInvalid={!!errors.startDate}
                       value = {startDateValue || ''}
                       onChange={(e) => {
                         const newStartDateValue = e.target.value;
-                        setStartDateValue(newStartDateValue);
+                        setValue('startDate', newStartDateValue);
 
                         if (endDateValue && newStartDateValue) {
                             const days = calculateRequestedDays(stringToDate(newStartDateValue), stringToDate(endDateValue));
-                            setRequestedDaysValue(days);
+                            setValue('requestedDays', days);
                         }
                         if (requestedDaysValue && newStartDateValue) {
-                            setEndDateValue(dateToString(calculateEndDate(new Date(newStartDateValue), requestedDaysValue)));
+                            setValue('endDate', dateToString(calculateEndDate(new Date(newStartDateValue), requestedDaysValue)));
                         }
                       }}/>
-        <Form.Control.Feedback type="invalid">
-
-        </Form.Control.Feedback>
+    {
+    errors.startDate &&
+    <Form.Control.Feedback type="invalid">
+         {errors.startDate.message}
+    </Form.Control.Feedback>
+    }
     </Form.Group>
     <Form.Group  className="mb-3">
         <Form.Label  htmlFor="requestedDays">Number of Requested Vacation Days</Form.Label>
         <Form.Control type="number"
                       id="requestedDays"
+                      isInvalid={!!errors.requestedDays}
                       value = {requestedDaysValue}
+                      {...register("requestedDays", {
+                        required: "Requested days is required",
+                        min: { value: 1, message: "Requested days must be greater than 0" }
+                      })}
                       onChange={(e) => {
                         const newRequestedDaysValue = Number(e.target.value);
-                        setRequestedDaysValue(newRequestedDaysValue);
+                        setValue('requestedDays', newRequestedDaysValue);
 
                         if (startDateValue) {
-                            setEndDateValue(dateToString(calculateEndDate(new Date(startDateValue), newRequestedDaysValue)));
+                            setValue('endDate', dateToString(calculateEndDate(new Date(startDateValue), newRequestedDaysValue)));
                         }
                         if (endDateValue && !startDateValue) {
-                            setStartDateValue(dateToString(calculateStartDate(new Date(endDateValue), newRequestedDaysValue)))
+                            setValue('startDate', dateToString(calculateStartDate(new Date(endDateValue), newRequestedDaysValue)))
                         }
                       }}/>
+    {
+    errors.requestedDays &&
     <Form.Control.Feedback type="invalid">
-
+         {errors.requestedDays.message}
     </Form.Control.Feedback>
+    }
     </Form.Group>
     <Form.Group  className="mb-3">
         <Form.Label  htmlFor="endDate">End Date</Form.Label>
         <Form.Control type="date" 
                       id="endDate"
+                      {...register("endDate", {
+                        required: "End date is required",
+                        validate: value =>
+                          new Date(value) >= new Date(startDateValue) || "End date must be the same or after the start date"
+                      })}
                       value = {endDateValue || ''}
+                      isInvalid={!!errors.endDate}
                       onChange={(e) => {
                         const newEndDateValue = e.target.value;
-                        setEndDateValue(newEndDateValue);
+                        setValue('endDate', newEndDateValue);
 
                         if (startDateValue && newEndDateValue) {
                             const days = calculateRequestedDays(stringToDate(startDateValue), stringToDate(newEndDateValue))
-                            setRequestedDaysValue(days);
+                            setValue('requestedDays', days);
                         }
                         if (requestedDaysValue && !startDateValue && newEndDateValue) {
-                            setStartDateValue(dateToString(calculateStartDate(new Date(newEndDateValue), requestedDaysValue)))
+                            setValue('startDate', dateToString(calculateStartDate(new Date(newEndDateValue), requestedDaysValue)))
                         }
                       }} />
+    {errors.endDate &&
     <Form.Control.Feedback type="invalid">
-
-    </Form.Control.Feedback>
+        {errors.endDate.message}
+    </Form.Control.Feedback>}
     </Form.Group>
     <Form.Group className="mb-3">
         <Form.Label  htmlFor="comment">Comment</Form.Label>
         <Form.Control as="textarea"
                       rows={3}
                       id="comment"
-                      onChange={(e) => setCommentValue(e.target.value)}/>
-    <Form.Control.Feedback type="invalid">
-
-    </Form.Control.Feedback>
+                      {...register('comment')}
+        />
     </Form.Group>
     <Button type="submit"
         variant="primary"
