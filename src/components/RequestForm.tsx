@@ -18,7 +18,7 @@ interface FormData {
 
 const RequestForm = () => {
   const navigate = useNavigate();
-  
+
   const post = async (payload: vacationRequest) => {
     const apiResult = await apiClient.post<vacationRequest>(
       "vacation_requests",
@@ -34,6 +34,7 @@ const RequestForm = () => {
     watch,
     formState: { errors },
   } = useForm<FormData>({
+    reValidateMode: "onSubmit",
     defaultValues: {
       startDate: "",
       requestedDays: 0,

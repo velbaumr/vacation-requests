@@ -3,7 +3,7 @@ import localStorageService from "./LocalStorageService";
 
 class ApiClient {
     get = async <T>(endpoint: string): Promise<apiResult<T>> => {
-        await this.stall(500);
+        await this.stall(1000);
 
         try {
             return {
@@ -21,7 +21,7 @@ class ApiClient {
 
     post = async <T>(endpoint: string, payload: T): Promise<apiResult<null>> => {
         try {
-                await this.stall(500);
+                await this.stall(300);
 
                 const items = localStorageService.getItem<T[]>(endpoint);
                 

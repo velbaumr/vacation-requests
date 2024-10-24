@@ -3,6 +3,7 @@ import apiClient from "../services/ApiCilent";
 import vacationRequest from "../types/VacationRequest";
 
 const RequestList = () => {
+  const [loading, setLoading] = useState(true);
   const [vacationRequests, setVacationRequests] = useState<
     vacationRequest[] | null
   >(null);
@@ -14,6 +15,8 @@ const RequestList = () => {
     apiResult.code === 200
       ? setVacationRequests(apiResult.data)
       : console.error(apiResult.error);
+
+      setLoading(false);
   };
 
   useEffect(() => {
@@ -21,6 +24,8 @@ const RequestList = () => {
   }, []);
 
   return (
+    <>
+    {loading && <h4>Loading...</h4>};
     <table className="table table-striped">
       <thead>
         <tr>
@@ -42,6 +47,7 @@ const RequestList = () => {
           ))}
       </tbody>
     </table>
+    </>
   );
 };
 
