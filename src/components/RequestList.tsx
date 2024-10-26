@@ -25,7 +25,7 @@ const RequestList = () => {
 
   return (
     <>
-    {loading && <h4>Loading...</h4>};
+    {loading && <h4>Loading...</h4>}
     <table className="table table-striped">
       <thead>
         <tr>
